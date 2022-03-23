@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Three JS ✨</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+      }
+
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        cursor: pointer;
+      }
+      .title {
+        font-family: monospace;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 10;
+        margin: 1rem;
+      }
+      .cross {
+        font-family: monospace;
+        position: absolute;
+        top: 0;
+        right: 0;
+        border: 1px solid black;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        place-items: center;
+        z-index: 10;
+        margin: 1rem;
+        cursor: pointer;
+      }
+      .actions {
+        z-index: 10;
+        width: 100%;
+        margin: 0.5rem;
+        position: absolute;
+        bottom: 0;
+        display: flex;
+        justify-content: space-around;
+      }
+      .btn {
+        padding: 0.5rem;
+        font-size: 1rem;
+        border-radius: 4px;
+        border: 1px solid white;
+        width: 120px;
+        background: rgba(69, 69, 69, 0.865);
+        color: white;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h3 class="title">Title: if any</h3>
+    <canvas id="bg"></canvas>
+    <h2 class="cross">X</h2>
+    <div class="actions">
+      <button type="submit" class="see3D btn">3D view</button>
+      <button class="seeAR btn">AR Exp</button>
+    </div>
+    <!-- THREE SCRIPT -->
+    <script crossorigin="anonymous" referrerpolicy="no-referrer" type="module">
+      import * as THREE from "https://cdn.skypack.dev/pin/three@v0.121.1-Do4S0HIdsbXGJLBPRMcz/mode=imports,min/optimized/three.js";
+
+      import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/OrbitControls.js";
+
+      import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/GLTFLoader.js";
+
+      const btns = document.querySelectorAll(".btn");
+      const close3DBtn = document.querySelector(".cross");
+      close3DBtn.style.display = "none";
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xdddcdc);
+
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas: document.querySelector("#bg"),
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      const loader = new GLTFLoader();
+      var obj;
+      loader.load(
+        "https://raw.githubusercontent.com/shashwa7-dev/Image_bucket/460e0950d10db884805bcda58852621e2778363b/shiba/scene.gltf",
+        function (gltf) {
+          obj = gltf.scene;
+          scene.add(gltf.scene);
+        }
+      );
+
+      // var light = new THREE.HemisphereLight(0xffffff, 0x000000, 10);
+      //scene.add(light);
+      // const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+      // scene.add(ambientLight);
+
+      camera.position.set(0, 0, 3);
+      const light = new THREE.PointLight(0x000000);
+      light.position.set(20, 50, 25);
+      scene.add(light);
+      // White directional light at half intensity shining from the top.
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+      scene.add(directionalLight);
+
+      //mouse listeners/events
+      const controls = new OrbitControls(camera, renderer.domElement);
+
+      //btn eventlisteners
+      let executed = false;
+      btns[0].addEventListener("click", () => {
+        if (!executed) {
+          executed = true;
+          animate();
+          close3DBtn.style.display = "grid";
+        }
+      });
+
+      //close 3D play
+      close3DBtn.addEventListener("click", () => window.location.reload());
+
+      renderer.render(scene, camera);
+
+      function animate() {
+        requestAnimationFrame(animate);
+        obj.rotation.y += 0.004;
+        renderer.render(scene, camera);
+      }
+    </script>
+  </body>
+</html>
