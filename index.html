@@ -13,64 +13,32 @@
         padding: 0;
         margin: 0;
       }
-
-      canvas {
-        position: absolute;
-        top: 0;
-        left: 0;
-        cursor: pointer;
+      body {
+        overflow: hidden;
+        background-color: #212121;
       }
-      .title {
-        font-family: monospace;
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 10;
-        margin: 1rem;
-      }
-      .cross {
-        font-family: monospace;
-        position: absolute;
-        top: 0;
-        right: 0;
-        border: 1px solid black;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        place-items: center;
-        z-index: 10;
-        margin: 1rem;
-        cursor: pointer;
-      }
-      .actions {
-        z-index: 10;
-        width: 100%;
-        margin: 0.5rem;
-        position: absolute;
-        bottom: 0;
-        display: flex;
-        justify-content: space-around;
-      }
-      .btn {
+      .logo {
+        display: block;
+        max-width: 100%;
+        width: 200px;
         padding: 0.5rem;
-        font-size: 1rem;
-        border-radius: 4px;
-        border: 1px solid white;
-        width: 120px;
-        background: rgba(69, 69, 69, 0.865);
-        color: white;
-        cursor: pointer;
+      }
+      .logoLink {
+        position: absolute;
+        display: block;
+        top: 0;
+        left: 0;
       }
     </style>
   </head>
   <body>
-    <h3 class="title">Title: if any</h3>
-    <canvas id="bg"></canvas>
-    <h2 class="cross">X</h2>
-    <div class="actions">
-      <button type="submit" class="see3D btn">3D view</button>
-      <button class="seeAR btn">AR Exp</button>
-    </div>
+    <a href="https://www.cyberpunk.net/in/en/" target="_blank" class="logoLink">
+      <img
+        src="https://raw.githubusercontent.com/shashwa7-dev/Image_bucket/master/logo.png"
+        alt="log"
+        class="logo"
+      />
+    </a>
     <!-- THREE SCRIPT -->
     <script crossorigin="anonymous" referrerpolicy="no-referrer" type="module">
       import * as THREE from "https://cdn.skypack.dev/pin/three@v0.121.1-Do4S0HIdsbXGJLBPRMcz/mode=imports,min/optimized/three.js";
@@ -79,13 +47,11 @@
 
       import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/GLTFLoader.js";
 
-      const btns = document.querySelectorAll(".btn");
-      const close3DBtn = document.querySelector(".cross");
-      close3DBtn.style.display = "none";
-
+      const modelSrc =
+        "https://raw.githubusercontent.com/shashwa7-dev/Image_bucket/master/cyberpunk_card/scene.gltf";
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xdddcdc);
-
+      scene.background = new THREE.Color(0x212121);
+      const camPos = 40;
       const camera = new THREE.PerspectiveCamera(
         75,
         window.innerWidth / window.innerHeight,
@@ -93,57 +59,61 @@
         1000
       );
 
-      const renderer = new THREE.WebGLRenderer({
-        canvas: document.querySelector("#bg"),
-      });
+      // const gridHelper = new THREE.GridHelper(200, 50);
+      // scene.add(gridHelper);
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(window.devicePixelRatio); //removes blurred edges
       renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
 
+      const modelLh = new THREE.Object3D();
       const loader = new GLTFLoader();
       var obj;
-      loader.load(
-        "https://raw.githubusercontent.com/shashwa7-dev/Image_bucket/460e0950d10db884805bcda58852621e2778363b/shiba/scene.gltf",
-        function (gltf) {
-          obj = gltf.scene;
-          scene.add(gltf.scene);
-        }
-      );
+      loader.load(modelSrc, function (gltf) {
+        modelLh.add(gltf.scene); // this gltf.scene is centered
+        const box = new THREE.Box3().setFromObject(gltf.scene);
+        const c = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        gltf.scene.position.set(-c.x, size.y / camPos - c.y, -c.z); // center the gltf scene
+        modelLh.add(gltf.scene);
 
-      // var light = new THREE.HemisphereLight(0xffffff, 0x000000, 10);
-      //scene.add(light);
-      // const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-      // scene.add(ambientLight);
+        obj = gltf.scene;
+        scene.add(gltf.scene);
+      });
 
-      camera.position.set(0, 0, 3);
-      const light = new THREE.PointLight(0x000000);
-      light.position.set(20, 50, 25);
-      scene.add(light);
-      // White directional light at half intensity shining from the top.
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-      scene.add(directionalLight);
+      camera.position.set(0, 0, -camPos);
+
+      //lights
+      const pointLight = new THREE.PointLight(0xffffff, 1.5, 100);
+      pointLight.position.set(10, 10, -30);
+      var light = new THREE.HemisphereLight(0xffffff, 0x00000, 5);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 2);
+      scene.add(ambientLight, light, pointLight);
 
       //mouse listeners/events
       const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableZoom = false;
 
-      //btn eventlisteners
-      let executed = false;
-      btns[0].addEventListener("click", () => {
-        if (!executed) {
-          executed = true;
-          animate();
-          close3DBtn.style.display = "grid";
-        }
-      });
+      function handleWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
 
-      //close 3D play
-      close3DBtn.addEventListener("click", () => window.location.reload());
-
-      renderer.render(scene, camera);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.render(scene, camera);
+      }
 
       function animate() {
         requestAnimationFrame(animate);
-        obj.rotation.y += 0.004;
+        if (obj) obj.rotation.y += 0.004;
         renderer.render(scene, camera);
+
+        controls.update();
       }
+      renderer.render(scene, camera);
+
+      animate();
+
+      window.addEventListener("resize", handleWindowResize);
     </script>
   </body>
 </html>
