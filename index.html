@@ -99,8 +99,11 @@
         },
         function (xhr) {
           console.log("Ajax object data", xhr);
-          if (xhr.loaded !== modelSize) console.log("loading ...");
-          if (xhr.loaded === modelSize) console.log("loaded!");
+          console.log("loaded:", xhr.loaded);
+          console.log(
+            "Ajax object",
+            (xhr.loaded / modelSize) * 100 + "% loaded"
+          );
         },
         function (error) {
           console.log("An error happened");
