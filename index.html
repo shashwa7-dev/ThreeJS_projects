@@ -84,27 +84,27 @@
       const modelLh = new THREE.Object3D();
       const loader = new GLTFLoader();
       var obj;
-
-      function removeLoader() {
-        document.querySelector(".loader").style.display = "none";
-      }
-
-      window.onload = () => {
-        removeLoader();
-        loader.load(modelSrc, function (gltf) {
+      loader.load(
+        modelSrc,
+        function (gltf) {
           modelLh.add(gltf.scene); // this gltf.scene is centered
           const box = new THREE.Box3().setFromObject(gltf.scene);
           const c = box.getCenter(new THREE.Vector3());
           const size = box.getSize(new THREE.Vector3());
           gltf.scene.position.set(-c.x, size.y / camPos - c.y, -c.z); // center the gltf scene
           modelLh.add(gltf.scene);
-
           obj = gltf.scene;
           scene.add(gltf.scene);
-        });
-      };
-
-      camera.position.set(0, 0, -camPos);
+        },
+        function (xhr) {
+          console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+        },
+        function (error) {
+          console.log("An error happened");
+          console.log(error);
+        }
+      ),
+        camera.position.set(0, 0, -camPos);
 
       //lights
       const pointLight = new THREE.PointLight(0xffffff, 1.5, 100);
@@ -136,6 +136,11 @@
 
       animate();
 
+      function removeLoader() {
+        document.querySelector(".loader").style.display = "none";
+      }
+
+      window.onload = removeLoader();
       window.addEventListener("resize", handleWindowResize);
     </script>
   </body>
