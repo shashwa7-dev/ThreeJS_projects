@@ -84,20 +84,25 @@
       const modelLh = new THREE.Object3D();
       const loader = new GLTFLoader();
       var obj;
-      fetch(
-        "https://raw.githubusercontent.com/shashwa7-dev/Image_bucket/master/cyberpunk_card/scene.gltf"
-      ).then((res) => console.log(res.body));
-      loader.load(modelSrc, function (gltf) {
-        modelLh.add(gltf.scene); // this gltf.scene is centered
-        const box = new THREE.Box3().setFromObject(gltf.scene);
-        const c = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-        gltf.scene.position.set(-c.x, size.y / camPos - c.y, -c.z); // center the gltf scene
-        modelLh.add(gltf.scene);
 
-        obj = gltf.scene;
-        scene.add(gltf.scene);
-      });
+      function removeLoader() {
+        document.querySelector(".loader").style.display = "none";
+      }
+
+      window.onload = () => {
+        removeLoader();
+        loader.load(modelSrc, function (gltf) {
+          modelLh.add(gltf.scene); // this gltf.scene is centered
+          const box = new THREE.Box3().setFromObject(gltf.scene);
+          const c = box.getCenter(new THREE.Vector3());
+          const size = box.getSize(new THREE.Vector3());
+          gltf.scene.position.set(-c.x, size.y / camPos - c.y, -c.z); // center the gltf scene
+          modelLh.add(gltf.scene);
+
+          obj = gltf.scene;
+          scene.add(gltf.scene);
+        });
+      };
 
       camera.position.set(0, 0, -camPos);
 
@@ -131,11 +136,6 @@
 
       animate();
 
-      function removeLoader() {
-        document.querySelector(".loader").style.display = "none";
-      }
-
-      window.onload = removeLoader();
       window.addEventListener("resize", handleWindowResize);
     </script>
   </body>
