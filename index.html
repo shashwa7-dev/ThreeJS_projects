@@ -51,7 +51,7 @@
         "https://raw.githubusercontent.com/shashwa7-dev/Image_bucket/master/cyberpunk_card/scene.gltf";
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x212121);
-      const camPos = 40;
+      const camPos = 30;
       const camera = new THREE.PerspectiveCamera(
         75,
         window.innerWidth / window.innerHeight,
@@ -85,7 +85,7 @@
 
       //lights
       const pointLight = new THREE.PointLight(0xffffff, 1.5, 100);
-      pointLight.position.set(10, 10, -30);
+      pointLight.position.set(10, 10, 10);
       var light = new THREE.HemisphereLight(0xffffff, 0x00000, 5);
       const ambientLight = new THREE.AmbientLight(0xffffff, 2);
       scene.add(ambientLight, light, pointLight);
