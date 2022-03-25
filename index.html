@@ -29,9 +29,24 @@
         top: 0;
         left: 0;
       }
+      .loader {
+        background-color: rgba(36, 36, 36, 0.835);
+        position: absolute;
+        height: 100vh;
+        width: 100%;
+        top: 0;
+        left: 0;
+        z-index: 100;
+        display: grid;
+        place-items: center;
+        font-size: 2rem;
+        color: white;
+        font-family: monospace;
+      }
     </style>
   </head>
   <body>
+    <div class="loader">Loading...</div>
     <a href="https://www.cyberpunk.net/in/en/" target="_blank" class="logoLink">
       <img
         src="https://raw.githubusercontent.com/shashwa7-dev/Image_bucket/master/logo.png"
@@ -69,6 +84,9 @@
       const modelLh = new THREE.Object3D();
       const loader = new GLTFLoader();
       var obj;
+      fetch(
+        "https://raw.githubusercontent.com/shashwa7-dev/Image_bucket/master/cyberpunk_card/scene.gltf"
+      ).then((res) => console.log(res.body));
       loader.load(modelSrc, function (gltf) {
         modelLh.add(gltf.scene); // this gltf.scene is centered
         const box = new THREE.Box3().setFromObject(gltf.scene);
@@ -85,9 +103,9 @@
 
       //lights
       const pointLight = new THREE.PointLight(0xffffff, 1.5, 100);
-      pointLight.position.set(10, 10, 10);
+      pointLight.position.set(10, 20, 40);
       var light = new THREE.HemisphereLight(0xffffff, 0x00000, 5);
-      const ambientLight = new THREE.AmbientLight(0xffffff, 2);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 4);
       scene.add(ambientLight, light, pointLight);
 
       //mouse listeners/events
@@ -113,6 +131,11 @@
 
       animate();
 
+      function removeLoader() {
+        document.querySelector(".loader").style.display = "none";
+      }
+
+      window.onload = removeLoader();
       window.addEventListener("resize", handleWindowResize);
     </script>
   </body>
