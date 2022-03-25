@@ -82,6 +82,7 @@
       document.body.appendChild(renderer.domElement);
 
       const modelLh = new THREE.Object3D();
+      const modelSize = 12332;
       const loader = new GLTFLoader();
       var obj;
       loader.load(
@@ -97,7 +98,9 @@
           scene.add(gltf.scene);
         },
         function (xhr) {
-          console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+          console.log("Ajax object data", xhr);
+          if (xhr.loaded !== modelSize) console.log("loading ...");
+          if (xhr.loaded === modelSize) console.log("loaded!");
         },
         function (error) {
           console.log("An error happened");
